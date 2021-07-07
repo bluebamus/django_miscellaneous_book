@@ -12,8 +12,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 import os
 from pathlib import Path
-
 from decouple import config
+from os.path import join
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'helpers',
-    'users',    
+    'users',
+    'log_test',
 ]
 
 MIDDLEWARE = [
@@ -127,3 +128,100 @@ AUTH_USER_MODEL = 'users.User'
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+# server_time - 서버의 시간
+# asctime - 현재 시간
+
+# disable_existing_loggers : True일 경우 기본 구성의 logger들이 비활성화된다.
+
+# file 핸들러
+# 'filters': ['require_debug_false'],  디버그모드가 False일때만 작동합니다
+# class - 파일 핸들러로 RotatingFileHandler 사용, RotatingFileHandler는 
+# 파일 크기가 설정한 크기보다 커지면 파일 뒤에 인덱스를 붙여서 백업한다. 
+# 이 핸들러의 장점은 로그가 무한히 증가되더라도 일정 개수의 파일로 롤링(Rolling)되기 때문에 
+# 로그 파일이 너무 커져서 디스크가 꽉 차는 위험을 방지할 수 있다.
+# backupCount - 롤링되는 파일의 개수를 의미한다. 총 5개의 로그 파일로 유지
+# 'maxBytes': 1024*1024*5,  # 5 MB
+
+# 두 class 중 하나를 사용하는듯
+# 'class': 'logging.handlers.RotatingFileHandler', -> 파일 용량을 정해서 log를 쌓고 제거할 때
+# 'class': 'logging.FileHandler', -> 로그를 계속 쌓고 싶을 때
+# TimedRotatingFileHandler -> 시간을 정해서 log를 쌓고 제거할 때
+
+# style 은 %, 〈{〈 또는 〈$〉 중 하나
+
+# style 이 〈%〉 이면, 메시지 포맷 문자열은 %(<dictionary key>)s 스타일의 문자열 치환을 사용
+# - 가능한 키 확인 : https://docs.python.org/ko/3/library/logging.html#logrecord-attributes
+# style이 〈{〈 인 경우 메시지 포맷 문자열은 str.format()(키워드 인자 사용)과 호환되는 것으로 가정
+# 스타일이 〈$〉 이면 메시지 포맷 문자열은 string.Template.substitute() 가 기대하는 것과 일치
+
+# 주요 기능 참고
+# https://docs.python.org/ko/3/howto/logging.html
+
+# 고급 설정 참고
+# https://runebook.dev/ko/docs/django/topics/logging
+# https://djangodeconstructed.com/2018/12/18/django-and-python-logging-in-plain-english/
+
+DEFAULT_LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+    'formatters': {
+        'django.server': {
+            '()': 'django.utils.log.ServerFormatter',            
+			'format': '[{server_time}] {message}',
+			'datefmt': '%d/%b/%Y %H:%M:%S',
+            'style': '{',
+        },
+        'standard': {
+            'format': '%(asctime)s %(levelname)s [%(name)s:%(lineno)s] %(message)s',
+            'datefmt': '%d/%b/%Y %H:%M:%S',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'filters': ['require_debug_false'],
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': join(ROOT_DIR, 'logs/logfile.log'),
+            'maxBytes': 1024*1024*5, 
+            'backupCount': 5,
+            'formatter': 'standard',
+        },		
+        'console': {
+            'level': 'DEBUG',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+			'formatter': 'standard',            
+        },
+        'django.server': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'django.server',
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler'
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+        },
+        'django.server': {
+            'handlers': ['django.server'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    }
+}
