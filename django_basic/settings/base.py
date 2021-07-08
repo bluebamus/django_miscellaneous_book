@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'helpers',
     'users',
     'log_test',
+    'models_example',
+    'board_mini',
 ]
 
 MIDDLEWARE = [
