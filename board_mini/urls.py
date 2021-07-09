@@ -6,7 +6,8 @@ from .views import (
     create_or_update_article,
     ArticleListView, 
     ArticleDetailView, 
-    ArticleCreateUpdateView
+    ArticleCreateUpdateView,
+    UserRegistrationView
     )
 
 app_name = "board_mini"
@@ -23,4 +24,6 @@ urlpatterns = [
     path('article/create/', ArticleCreateUpdateView.as_view()),
     path('article/<article_id>/', ArticleDetailView.as_view()),
     path('article/<article_id>/update/', ArticleCreateUpdateView.as_view()),
+    
+    path('user/create/', UserRegistrationView.as_view()),
 ]

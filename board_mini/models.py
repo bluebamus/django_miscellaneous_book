@@ -1,4 +1,7 @@
 from django.db import models
+from django.utils import timezone
+from django.http import HttpResponseRedirect
+from .user_models import UserBasicModel
 
 # reference : https://swarf00.github.io/2018/11/23/build-model.html
 
@@ -25,8 +28,19 @@ class Article(models.Model):
     title      = models.CharField('제목', max_length=126, null=False)
     content    = models.TextField('내용', null=False)
     author     = models.CharField('작성자', max_length=16, null=False)
-    created_at = models.DateTimeField('작성일', auto_now_add=True)
+    
+    #created_at = models.DateTimeField('작성일', auto_now_add=True)
     #created_at.editable = True    # auto_now_add=True로 admin 페이지에서 수정이 불가능하기 때문에 created의 editable 속성에 True를 설정했습니다.
+
+    created_at = models.DateTimeField('작성일', default=timezone.now) 
+    # 대신 디폴트값으로 현재시간을 저장하도록 수정하면 자동으로 created_at 값이 생성될 뿐만 아니라 
+    # editable 속성도 True 로 설정되기 때문에 일석이조입니다
 
     def __str__(self):
         return '[{}] {}'.format(self.id, self.title)
+
+
+class User(UserBasicModel):
+
+    def __str__(self):
+        return '[{}] {}'.format(self.email, self.username)

@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseNotAllowed
-from .models import Article
+from .models import Article, User
 
-#==============================FBV 구현==============================
+#==============================Blog FBV 구현==============================
 
 def hello(request, to):
     return HttpResponse('Hello {}.'.format(to))
@@ -43,7 +43,7 @@ def do_create_article(request):
 def do_update_article(request):
     return HttpResponse(request.POST)
 
-#==============================CBV 구현 [TemplateView] ==============================
+#==============================Blog CBV 구현 [TemplateView] ==============================
 
 # *[QuerySet관련 mixin]*
 
@@ -86,11 +86,13 @@ class ArticleListView(TemplateView):         # 게시글 목록
     queryset = Article.objects.all()         # 모든 게시글
 
     def get(self, request, *args, **kwargs):
-        print(request.GET)
         ctx = {
             #'view': self.__class__.__name__, # 클래스의 이름, 해당 제네릭뷰 인스턴스의 클래스 이름
-            #'data': self.queryset            # 검색 결과
-            'articles': self.queryset
+            #'data': self.get_queryset()            # 검색 결과
+            #'articles': self.queryset
+            # 이렇게 호출하면 갱신된 DB 데이터가 아니라 캐시된 데이터를 전달함, 새로 추가된 데이터는
+            # print 등으로 인한 DB 평가가 되지 않으면 출력되지 않음, order_by하면 평가가 되는듯
+            'articles': self.queryset.order_by('-id')
         }
         return self.render_to_response(ctx) # render_to_response 템플릿을 자동적으로 기본 템플릿 엔진을 이용해서 html로 변환해주는 함수
 
@@ -191,3 +193,28 @@ class ArticleCreateUpdateView(TemplateView):
             'article': self.get_object() if action == 'update' else None
         }
         return self.render_to_response(ctx)           # 액션 작업 후 화면을 보냄
+
+
+#==============================Auth CBV 구현 [CreateView,]==============================
+
+from django.contrib.auth import get_user_model
+from django.views.generic import CreateView
+
+from .forms import UserRegistrationForm
+
+# model 이 정의되면 내부적으로 Form 객체를 자동 생성하는데 
+# 이 때 모델의 모든 필드를 이용해서 폼을 만드는 것이 아니라 
+# fields 라는 클래스변수를 참조해서 정의되어 있는 필드만 이용합니다.
+
+# 자동으로 해당 앱의 templates 디렉토리에서 앱이름의 디렉토리 하위의 모델명_form.html 파일을 템플릿으로 사용합니다. 
+# 우리의 예제에서는 user/template/user/user_model.html 파일을 검색하게 되는 겁니다.
+
+# template_suffix 클래스변수를 정의하면 template 파일명의 _form 대신에 다른 문자열로 대치도 가능합니다. 
+# 예를들어 template_suffix 를 '_registration' 으로 변경하면 
+# user/template/user/user_registration.html 파일을 찾게 되는 것이죠.
+
+class UserRegistrationView(CreateView):
+    model = User                            # 자동생성 폼에서 사용할 모델
+    #fields = ('email', 'username', 'password')  # 자동생성 폼에서 사용할 필드
+    form_class = UserRegistrationForm
+    success_url = '/boardmini/article/' # 해당 변수가 없으면 get_absolute_url을 접근함

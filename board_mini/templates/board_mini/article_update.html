@@ -8,20 +8,7 @@
 
 {% block content %}
 
-{% if messages %}                            <!-- message 프레임워크 -->
 
-<!-- messages 객체는 iterable 객체이기 때문에 for-in 루프로 반복출력해야 합니다 -->
-<!-- message 그 자체를 출력해도 되고 message.tags 또는 message.level를 이용하셔도 됩니다. 
-message.level은 message를 저장할 때 사용하는 그 레벨이 출력이 되고, 
-tags는 extra_tags와 message.level의 조합입니다. 
-이 예제에서는 message.tags를 이용했는데 extra_tags를 전달하지 않았기 때문에 level값만 출력이 됩니다. -->
-
-{% for message in messages %}
-<div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
-  {{ message }}
-</div>
-{% endfor %}
-{% endif %}
 
 <!-- upate는 url에 article.pk 값이 포함되기 때문에 아직 객체가 생성되지 않은 create 액션은 사용할 수 없는 url입니다. 그래서 현재 url을 의미하는 .을 이용했습니다. 어차피 post나 get이나 모두 같은 뷰에서 처리하니 url이 같아도 상관없습니다.
 

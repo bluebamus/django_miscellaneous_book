@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'helpers',
-    'users',
+    #'users', # board_mini AbstractBaseUser user와 충돌
     'log_test',
     'models_example',
     'board_mini',
@@ -79,6 +79,27 @@ WSGI_APPLICATION = 'django_basic.wsgi.application'
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
+
+'''
+UserAttributeSimiarityValidator 는 사용자 모델의 속성(즉, 필드)와 비교해서 유사한 경우 
+오류를 발생시키는 유틸리티입니다. 
+
+기본으로 비교하는 필드는 정해져 있지만 수정이 가능합니다. 
+username, first_name, last_name, email 이 네 가지를 비교하는데 email을 제외하고 
+나머지 3개의 필드들은 새로운 사용자 모델에서 삭제했었죠. 
+
+그러니 email과 name 두 가지의 필드를 user_attributes 이라는 이름의 옵션으로 전달해주면 됩니다. 
+
+또한 유사도를 나타내는 max_similarity 옵션도 있지만 기본값으로 0.7이라는 값이 설정되어 있는데
+굳이 변경할 필요가 없어 보입니다. 
+validator에 옵션을 전달하는 방법은 설정파일의 AUTH_PASSWORD_VALIDATORS 변수에 옵션을 전달해주면 됩니다.
+{
+
+    'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+
+    'OPTION': {'user_attributes': ('email', 'name')},
+},
+'''
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -126,7 +147,9 @@ LOGIN_REDIRECT_URL = "/"
 # LOGOUT_REDIRECT_URL = None
 
 # 인증에 사용할 커스텀 User 모델 지정 : '앱이름.모델명'
-AUTH_USER_MODEL = 'users.User'
+# user app test 사용
+# AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'board_mini.User'
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
@@ -163,6 +186,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # 고급 설정 참고
 # https://runebook.dev/ko/docs/django/topics/logging
 # https://djangodeconstructed.com/2018/12/18/django-and-python-logging-in-plain-english/
+
+'''
+윈도우 테스트시 debug level 출력 안됨, 파일 출력 안됨
+차후 버그 픽스
+'''
 
 DEFAULT_LOGGING = {
     'version': 1,
