@@ -27,7 +27,11 @@ from .user_models import UserBasicModel
 class Article(models.Model):
     title      = models.CharField('제목', max_length=126, null=False)
     content    = models.TextField('내용', null=False)
-    author     = models.CharField('작성자', max_length=16, null=False)
+    # author     = models.CharField('작성자', max_length=16, null=False)
+
+    # 앱이 많아지면(실무에선) 이런 방식으로 선언하는 것을 추천합니다
+    # '앱label.모델이름' board_mini.User
+    author     = models.ForeignKey('User', related_name='articles', on_delete=models.CASCADE)
     
     #created_at = models.DateTimeField('작성일', auto_now_add=True)
     #created_at.editable = True    # auto_now_add=True로 admin 페이지에서 수정이 불가능하기 때문에 created의 editable 속성에 True를 설정했습니다.

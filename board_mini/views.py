@@ -140,8 +140,15 @@ class ArticleCreateUpdateView(TemplateView):
         pk = self.kwargs.get(self.pk_url_kwargs)
         article = queryset.filter(pk=pk).first()
         
-        if pk and not article:                    # 검색결과가 없으면 곧바로 에러 발생
+        # if pk and not article:                    # 검색결과가 없으면 곧바로 에러 발생
+        #     raise Http404('invalid pk')
+        # return article
+
+        if pk:
+          if not article:
             raise Http404('invalid pk')
+          elif article.author != self.request.user:                             # 작성자가 수정하려는 사용자와 다른 경우
+            raise Http404('invalid user')
         return article
 
     def get(self, request, *args, **kwargs):
@@ -160,11 +167,16 @@ class ArticleCreateUpdateView(TemplateView):
 
     def post(self, request, *args, **kwargs):
         action = request.POST.get('action')           # request.POST 객체에서 데이터 얻기
-        post_data = {key: request.POST.get(key) for key in ('title', 'content', 'author')}
+
+        #post_data = {key: request.POST.get(key) for key in ('title', 'content', 'author')}
+        post_data = {key: request.POST.get(key) for key in ('title', 'content')} # 작성자를 입력받지 않도록 수정
+
         for key in post_data:                         # 세가지 데이터 모두 있어야 통과
             if not post_data[key]:
                 messages.error(self.request, '{} 값이 존재하지 않습니다.'.format(key), extra_tags='danger') # error 레벨로 메시지 저장
 
+        post_data['author'] = self.request.user                                  # 작성자를 현재 사용자로 설정
+        
         # messsages 모듈의 debug, info, success, warning, error 5가지 함수 중 하나를 선택해서
         # request 객체와 저장할 메시지를 전달하면 됩니다
 
