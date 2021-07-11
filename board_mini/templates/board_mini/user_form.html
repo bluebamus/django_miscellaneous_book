@@ -1,7 +1,6 @@
 {% extends 'board_mini/base.html' %}
 {% load i18n %}
-
-{% block title %}<title>회원 가입</title>{% endblock %}
+<!--{% load i18n %}는 template tag로 다국어 지원을 선언하고 {% trans ... %}로 적용한다.-->
 
 {% block css %}
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
@@ -22,6 +21,8 @@
     }
 </style>
 {% endblock css %}
+
+{% block title %}<title>회원 가입</title>{% endblock %}
 
 {% block content %}
 <div class="panel panel-default registration">

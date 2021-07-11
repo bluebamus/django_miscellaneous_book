@@ -3,6 +3,7 @@ from django.contrib.auth.models import (
 )
 from django.db import models
 from django.utils import timezone
+from django.core.mail import send_mail
 from django.utils.translation import ugettext_lazy as _
 #from .managers import UserManager
 
@@ -10,8 +11,21 @@ from django.utils.translation import ugettext_lazy as _
 class UserBasicModel(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField('email', unique=True)
     username = models.CharField('이름', max_length=30, blank=True) # AbstractBaseUser의 name은 꼭 username로 명시해야 한다
-    is_staff = models.BooleanField('스태프 권한', default=False)
-    is_active = models.BooleanField('사용중', default=True)
+    # is_staff = models.BooleanField('스태프 권한', default=False)
+    # is_active = models.BooleanField('사용중', default=True)
+    is_staff = models.BooleanField(
+        _('staff status'),
+        default=False,
+        help_text=_('Designates whether the user can log into this admin site.'),
+    )
+    is_active = models.BooleanField(
+        _('active'),
+        default=False,                 # 기본값을 False 로 변경
+        help_text=_(
+            'Designates whether this user should be treated as active. '
+            'Unselect this instead of deleting accounts.'
+        ),
+    )
     date_joined = models.DateTimeField('가입일', default=timezone.now)
 
     objects = UserManager()

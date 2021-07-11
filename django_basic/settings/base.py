@@ -135,16 +135,28 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # 기본 로그인 페이지 URL 지정
 # login_required 장식자 등에 의해서 사용
-LOGIN_URL = "/login/"
+
+# 기본형
+#LOGIN_URL = "/login/"
+
+# board_mini 설정
+LOGIN_URL = "/boardmini/user/login/"
 
 # 로그인 완료 후 next 인자가 지정되면 해당 URL 페이지로 이동
 # next 인자가 없으면 아래 URL로 이동
-LOGIN_REDIRECT_URL = "/"
+
+# 기본형
+# LOGIN_REDIRECT_URL = "/"
+
+# board_mini 설정
+LOGIN_REDIRECT_URL = "/boardmini/article/"
+
 
 # 로그아웃 후에 next 인자기 지정되면 해당 URL 페이지로 이동
 # next 인자가 없으면 LOGOUT_REDIRECT_URL로 이동
 # LOGOUT_REDIRECT_URL이 None(디폴트)이면, 'registration/logged_out.html' 템플릿 렌더링
 # LOGOUT_REDIRECT_URL = None
+LOGOUT_REDIRECT_URL = "/boardmini/article/"
 
 # 인증에 사용할 커스텀 User 모델 지정 : '앱이름.모델명'
 # user app test 사용
@@ -153,6 +165,13 @@ AUTH_USER_MODEL = 'board_mini.User'
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+# Email 관련 설정
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT')
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = True
 
 # server_time - 서버의 시간
 # asctime - 현재 시간
