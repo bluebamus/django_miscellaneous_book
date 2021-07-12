@@ -25,6 +25,7 @@ urlpatterns = [
     path('boardmini/', include('board_mini.urls')),
     path('users/', include('users.urls')),
     path('log/', include('log_test.urls')),
+    path('naveroauth/', include('naver_oauth.urls')),
 ] 
 
 if settings.DEBUG:

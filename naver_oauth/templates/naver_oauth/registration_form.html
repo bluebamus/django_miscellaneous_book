@@ -1,0 +1,45 @@
+{% extends 'naver_oath/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}<title>회원 가입</title>{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+<style>
+    .user-panel {
+        width: 500px;
+        margin: 0 auto;
+    }
+    p {
+        text-align: center;
+    }
+    label {
+        width: 100%;
+        text-align: left;
+    }
+    .form-action {
+        text-align: center;
+    }
+</style>
+{% endblock css %}
+
+{% block content %}
+
+{% include 'user/partials/social_login_panel.html' with panel_name='소셜회원가입' %}
+
+<div class="panel panel-default user-panel">
+    <div class="panel-heading">
+        가입하기
+    </div>
+    <div class="panel-body">
+        <form action="." method="post">
+            {% csrf_token %}
+            {% include 'user/partials/form_field.html' with form=form %}
+            <div class="form-actions">
+                <button class="btn btn-primary btn-large" type="submit">가입하기</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}

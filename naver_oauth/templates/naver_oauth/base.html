@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        {% block title %}
+        <title>bbs - minitutorial</title>
+        {% endblock title %}
+
+        {% block meta %}
+        {% endblock meta %}
+
+        {% block scripts %}
+        {% endblock scripts %}
+
+        {% block css %}
+        {% endblock css %}
+    </head>
+    <body>
+    {% block header %}
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/boardmini/article/">게시글 목록</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="">
+                        {% if not request.user.is_authenticated %}
+                        <a href="/boardmini/user/create/">가입하기</a>
+                        {% endif %}
+                    </li>
+                    <li class="">
+                        {% if request.user.is_authenticated %}
+                        <a href="/boardmini/user/logout/">로그아웃</a>
+                        {% else %}
+                        <a href="/boardmini/user/login/">로그인</a>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </nav>
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+          {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
+    {% endblock header %}
+    
+    {% block content %}
+    {% endblock content %}
+    </body>
+</html>

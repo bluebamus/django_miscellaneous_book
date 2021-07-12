@@ -45,6 +45,29 @@ INSTALLED_APPS = [
     'log_test',
     'models_example',
     'board_mini',
+    'naver_oauth',
+]
+
+
+# 인증백엔드는 NaverLoginMixin 에서 사용을 하지만 이것은 로그인을 시도할 때 어떤 백엔드를 사용할 지에 대한 설정입니다.
+
+# 이후 로그인된 상태에서 또다른 요청을 할 때 장고는 세션의 정보를 확인하여 로그인된 사용자가 맞는지, 
+# 맞다면 어떤 사용자인지를 식별하는데 장고의 기본값인 기본인증백엔드를 통해 식별처리를 실행합니다. 
+
+# 소셜로그인으로 로그인 사용자를 위해 설정파일의 AUTHENTICATION_BACKENDS 변수에 NaverBackend 를 추가합니다. 
+
+# AUTHENTICATION_BACKENDS는 설정은 세션의 사용자 정보를 식별할 때 사용될 백엔드를 리스트로 설정하여 
+# 실제 사용자 정보를 식별할 때 리스트의 순서대로 백엔드에 인증을 시도하고, 
+# 인증이 되면 해당 인증된 사용자 정보를 넘겨주고, 인증에 실패할 경우 리스트의 다음 백엔드에 위임하게 됩니다. 
+# 모든 백엔드에서 인증에 실패할 경우 인증되지 않은 사용자라고 처리하는 것이죠.
+
+
+# 가장 많은 사용자가 이용하는 백엔드를 가장 위에 설정하고, 
+# 가장 사용하지 않는 백엔드를 가장 밑에 설정하는 것이 인증 성능을 높이는 한가지 포인트라고 할 수도 있습니다
+
+AUTHENTICATION_BACKENDS = [
+    'naver_oauth.user.oauth.backends.NaverBackend',           # 네이버 인증백엔드
+    'django.contrib.auth.backends.ModelBackend'
 ]
 
 MIDDLEWARE = [
@@ -172,6 +195,10 @@ EMAIL_PORT = config('EMAIL_PORT')
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = True
+
+# 소셜 로그인
+NAVER_CLIENT_ID=config('NAVER_CLIENT_ID')
+NAVER_SECRET_KEY=config('NAVER_SECRET_KEY')
 
 # server_time - 서버의 시간
 # asctime - 현재 시간
