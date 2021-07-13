@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'models_example',
     'board_mini',
     'naver_oauth',
+    'basic_skills',
 ]
 
 
