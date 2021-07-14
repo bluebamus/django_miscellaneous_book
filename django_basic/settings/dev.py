@@ -44,6 +44,10 @@ INSTALLED_APPS += [
     'django_nose',    
     ]
 
+# django-extentions로 ERP 만들때 해줘야 하는 설정
+GRAPH_MODELS = { 'all_applications' : True, 'group_models' : True, }
+
+
 MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'

@@ -19,7 +19,7 @@ from os.path import join
 BASE_DIR = Path(__file__).resolve().parent.parent
 ROOT_DIR = os.path.dirname(BASE_DIR)
 TEMPLATE_DIR = os.path.join(ROOT_DIR, "templates")
-APPS_DIR = os.path.join(BASE_DIR, 'apps') 
+# APPS_DIR = os.path.join(BASE_DIR, 'apps') 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'board_mini',
     'naver_oauth',
     'basic_skills',
+    'django.contrib.sites', # 사이트맵 라이브러리 추가
+    'django.contrib.sitemaps', # 사이트맵 라이브러리 추가
 ]
 
 
@@ -152,7 +154,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = False #true로 선택하면 UTC 기준으로 시간이 저장됨
+USE_TZ = False #true로 선택하면 UTC 기준으로 시간이 저장됨, True로 설정하고 다른 시간 함수로만으로 제어도 가능함
 # ref : https://it-eldorado.tistory.com/13
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
@@ -200,6 +202,9 @@ EMAIL_USE_TLS = True
 # 소셜 로그인
 NAVER_CLIENT_ID=config('NAVER_CLIENT_ID')
 NAVER_SECRET_KEY=config('NAVER_SECRET_KEY')
+
+# SEO Sitemap 만들기
+SITE_ID = 1 # ㅇ
 
 # server_time - 서버의 시간
 # asctime - 현재 시간
