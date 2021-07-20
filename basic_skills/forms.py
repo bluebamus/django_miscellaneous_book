@@ -1,7 +1,7 @@
 from django import forms
 
-from .validators import validate_tasty
-from .models import Flavor, IceCreamStore
+from .core.validators import validate_tasty
+from .models_ex.models_two_scoops_of_django import Flavor, IceCreamStore
 
 # 단지 폼에만 validate_tasty()를 이용하고자 할 때는 어떻게 해야 할까?
 # 타이틀 말고 다른 필드에 이를 적용하고 싶을 때는 어떻게 할 것인가?

@@ -4,7 +4,7 @@ from django.views.generic import TemplateView
 
 # from views_messages import *
 # from views_two_scoops_of_django import *
-from .views_cbv_mixin import FlavorListView
+from .views_ex.views_cbv_mixin import FlavorListView
 
 # sitemap 설정
 from django.contrib.sitemaps.views import sitemap
