@@ -19,13 +19,13 @@ from os.path import join
 BASE_DIR = Path(__file__).resolve().parent.parent
 ROOT_DIR = os.path.dirname(BASE_DIR)
 TEMPLATE_DIR = os.path.join(ROOT_DIR, "templates")
-# APPS_DIR = os.path.join(BASE_DIR, 'apps') 
+# APPS_DIR = os.path.join(BASE_DIR, 'apps')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
@@ -33,80 +33,81 @@ SECRET_KEY = config('SECRET_KEY')
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django_extensions',
-    'helpers',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django_extensions",
+    "helpers",
     #'users', # board_mini AbstractBaseUser user와 충돌
-    'log_test',
-    'models_example',
-    'board_mini',
-    'naver_oauth',
-    'basic_skills',
-    'django.contrib.sites', # 사이트맵 라이브러리 추가
-    'django.contrib.sitemaps', # 사이트맵 라이브러리 추가
+    "log_test",
+    "models_example",
+    "board_mini",
+    "naver_oauth",
+    "basic_skills",
+    "django.contrib.sites",  # 사이트맵 라이브러리 추가
+    "django.contrib.sitemaps",  # 사이트맵 라이브러리 추가
+    "orm_skills",
 ]
 
 
 # 인증백엔드는 NaverLoginMixin 에서 사용을 하지만 이것은 로그인을 시도할 때 어떤 백엔드를 사용할 지에 대한 설정입니다.
 
-# 이후 로그인된 상태에서 또다른 요청을 할 때 장고는 세션의 정보를 확인하여 로그인된 사용자가 맞는지, 
-# 맞다면 어떤 사용자인지를 식별하는데 장고의 기본값인 기본인증백엔드를 통해 식별처리를 실행합니다. 
+# 이후 로그인된 상태에서 또다른 요청을 할 때 장고는 세션의 정보를 확인하여 로그인된 사용자가 맞는지,
+# 맞다면 어떤 사용자인지를 식별하는데 장고의 기본값인 기본인증백엔드를 통해 식별처리를 실행합니다.
 
-# 소셜로그인으로 로그인 사용자를 위해 설정파일의 AUTHENTICATION_BACKENDS 변수에 NaverBackend 를 추가합니다. 
+# 소셜로그인으로 로그인 사용자를 위해 설정파일의 AUTHENTICATION_BACKENDS 변수에 NaverBackend 를 추가합니다.
 
-# AUTHENTICATION_BACKENDS는 설정은 세션의 사용자 정보를 식별할 때 사용될 백엔드를 리스트로 설정하여 
-# 실제 사용자 정보를 식별할 때 리스트의 순서대로 백엔드에 인증을 시도하고, 
-# 인증이 되면 해당 인증된 사용자 정보를 넘겨주고, 인증에 실패할 경우 리스트의 다음 백엔드에 위임하게 됩니다. 
+# AUTHENTICATION_BACKENDS는 설정은 세션의 사용자 정보를 식별할 때 사용될 백엔드를 리스트로 설정하여
+# 실제 사용자 정보를 식별할 때 리스트의 순서대로 백엔드에 인증을 시도하고,
+# 인증이 되면 해당 인증된 사용자 정보를 넘겨주고, 인증에 실패할 경우 리스트의 다음 백엔드에 위임하게 됩니다.
 # 모든 백엔드에서 인증에 실패할 경우 인증되지 않은 사용자라고 처리하는 것이죠.
 
 
-# 가장 많은 사용자가 이용하는 백엔드를 가장 위에 설정하고, 
+# 가장 많은 사용자가 이용하는 백엔드를 가장 위에 설정하고,
 # 가장 사용하지 않는 백엔드를 가장 밑에 설정하는 것이 인증 성능을 높이는 한가지 포인트라고 할 수도 있습니다
 
 AUTHENTICATION_BACKENDS = [
-    'naver_oauth.user.oauth.backends.NaverBackend',           # 네이버 인증백엔드
-    'django.contrib.auth.backends.ModelBackend'
+    "naver_oauth.user.oauth.backends.NaverBackend",  # 네이버 인증백엔드
+    "django.contrib.auth.backends.ModelBackend",
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'django_basic.urls'
+ROOT_URLCONF = "django_basic.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [TEMPLATE_DIR],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'django_basic.wsgi.application'
+WSGI_APPLICATION = "django_basic.wsgi.application"
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
-'''
+"""
 UserAttributeSimiarityValidator 는 사용자 모델의 속성(즉, 필드)와 비교해서 유사한 경우 
 오류를 발생시키는 유틸리티입니다. 
 
@@ -125,20 +126,20 @@ validator에 옵션을 전달하는 방법은 설정파일의 AUTH_PASSWORD_VALI
 
     'OPTION': {'user_attributes': ('email', 'name')},
 },
-'''
+"""
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -154,7 +155,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = False #true로 선택하면 UTC 기준으로 시간이 저장됨, True로 설정하고 다른 시간 함수로만으로 제어도 가능함
+USE_TZ = False  # true로 선택하면 UTC 기준으로 시간이 저장됨, True로 설정하고 다른 시간 함수로만으로 제어도 가능함
 # ref : https://it-eldorado.tistory.com/13
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
@@ -163,7 +164,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # login_required 장식자 등에 의해서 사용
 
 # 기본형
-#LOGIN_URL = "/login/"
+# LOGIN_URL = "/login/"
 
 # board_mini 설정
 LOGIN_URL = "/boardmini/user/login/"
@@ -187,24 +188,24 @@ LOGOUT_REDIRECT_URL = "/boardmini/article/"
 # 인증에 사용할 커스텀 User 모델 지정 : '앱이름.모델명'
 # user app test 사용
 # AUTH_USER_MODEL = 'users.User'
-AUTH_USER_MODEL = 'board_mini.User'
+AUTH_USER_MODEL = "board_mini.User"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Email 관련 설정
-EMAIL_HOST = config('EMAIL_HOST')
-EMAIL_PORT = config('EMAIL_PORT')
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+EMAIL_HOST = config("EMAIL_HOST")
+EMAIL_PORT = config("EMAIL_PORT")
+EMAIL_HOST_USER = config("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
 EMAIL_USE_TLS = True
 
 # 소셜 로그인
-NAVER_CLIENT_ID=config('NAVER_CLIENT_ID')
-NAVER_SECRET_KEY=config('NAVER_SECRET_KEY')
+NAVER_CLIENT_ID = config("NAVER_CLIENT_ID")
+NAVER_SECRET_KEY = config("NAVER_SECRET_KEY")
 
 # SEO Sitemap 만들기
-SITE_ID = 1 # ㅇ
+SITE_ID = 1  # ㅇ
 
 # server_time - 서버의 시간
 # asctime - 현재 시간
@@ -213,9 +214,9 @@ SITE_ID = 1 # ㅇ
 
 # file 핸들러
 # 'filters': ['require_debug_false'],  디버그모드가 False일때만 작동합니다
-# class - 파일 핸들러로 RotatingFileHandler 사용, RotatingFileHandler는 
-# 파일 크기가 설정한 크기보다 커지면 파일 뒤에 인덱스를 붙여서 백업한다. 
-# 이 핸들러의 장점은 로그가 무한히 증가되더라도 일정 개수의 파일로 롤링(Rolling)되기 때문에 
+# class - 파일 핸들러로 RotatingFileHandler 사용, RotatingFileHandler는
+# 파일 크기가 설정한 크기보다 커지면 파일 뒤에 인덱스를 붙여서 백업한다.
+# 이 핸들러의 장점은 로그가 무한히 증가되더라도 일정 개수의 파일로 롤링(Rolling)되기 때문에
 # 로그 파일이 너무 커져서 디스크가 꽉 차는 위험을 방지할 수 있다.
 # backupCount - 롤링되는 파일의 개수를 의미한다. 총 5개의 로그 파일로 유지
 # 'maxBytes': 1024*1024*5,  # 5 MB
@@ -239,71 +240,71 @@ SITE_ID = 1 # ㅇ
 # https://runebook.dev/ko/docs/django/topics/logging
 # https://djangodeconstructed.com/2018/12/18/django-and-python-logging-in-plain-english/
 
-'''
+"""
 윈도우 테스트시 debug level 출력 안됨, 파일 출력 안됨
 차후 버그 픽스
-'''
+"""
 
 DEFAULT_LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "filters": {
+        "require_debug_false": {
+            "()": "django.utils.log.RequireDebugFalse",
         },
-        'require_debug_true': {
-            '()': 'django.utils.log.RequireDebugTrue',
-        },
-    },
-    'formatters': {
-        'django.server': {
-            '()': 'django.utils.log.ServerFormatter',            
-			'format': '[{server_time}] {message}',
-			'datefmt': '%d/%b/%Y %H:%M:%S',
-            'style': '{',
-        },
-        'standard': {
-            'format': '%(asctime)s %(levelname)s [%(name)s:%(lineno)s] %(message)s',
-            'datefmt': '%d/%b/%Y %H:%M:%S',
-            'style': '{',
+        "require_debug_true": {
+            "()": "django.utils.log.RequireDebugTrue",
         },
     },
-    'handlers': {
-        'file': {
-            'level': 'INFO',
-            'filters': ['require_debug_false'],
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': join(ROOT_DIR, 'logs/logfile.log'),
-            'maxBytes': 1024*1024*5, 
-            'backupCount': 5,
-            'formatter': 'standard',
-        },		
-        'console': {
-            'level': 'DEBUG',
-            'filters': ['require_debug_true'],
-            'class': 'logging.StreamHandler',
-			'formatter': 'standard',            
+    "formatters": {
+        "django.server": {
+            "()": "django.utils.log.ServerFormatter",
+            "format": "[{server_time}] {message}",
+            "datefmt": "%d/%b/%Y %H:%M:%S",
+            "style": "{",
         },
-        'django.server': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'django.server',
-        },
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
+        "standard": {
+            "format": "%(asctime)s %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            "datefmt": "%d/%b/%Y %H:%M:%S",
+            "style": "{",
         },
     },
-    'loggers': {
-        'django': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
+    "handlers": {
+        "file": {
+            "level": "INFO",
+            "filters": ["require_debug_false"],
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": join(ROOT_DIR, "logs/logfile.log"),
+            "maxBytes": 1024 * 1024 * 5,
+            "backupCount": 5,
+            "formatter": "standard",
         },
-        'django.server': {
-            'handlers': ['django.server'],
-            'level': 'DEBUG',
-            'propagate': False,
+        "console": {
+            "level": "DEBUG",
+            "filters": ["require_debug_true"],
+            "class": "logging.StreamHandler",
+            "formatter": "standard",
         },
-    }
+        "django.server": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "django.server",
+        },
+        "mail_admins": {
+            "level": "ERROR",
+            "filters": ["require_debug_false"],
+            "class": "django.utils.log.AdminEmailHandler",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+        },
+        "django.server": {
+            "handlers": ["django.server"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+    },
 }
