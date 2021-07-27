@@ -37,3 +37,4 @@ class Command(BaseCommand):
         )
         seeder.execute()
         self.stdout.write(self.style.SUCCESS(f"{total} posts created!"))
+!
