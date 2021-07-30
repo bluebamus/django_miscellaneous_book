@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "django.contrib.sites",  # 사이트맵 라이브러리 추가
     "django.contrib.sitemaps",  # 사이트맵 라이브러리 추가
     "orm_skills",
+    "testcase_skills",
 ]
 
 

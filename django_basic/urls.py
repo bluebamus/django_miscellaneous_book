@@ -28,6 +28,7 @@ urlpatterns = [
     path("naveroauth/", include("naver_oauth.urls")),
     path("basicskills/", include("basic_skills.urls")),
     path("ormskills/", include("orm_skills.urls")),
+    path("testcaseskills/", include("testcase_skills.urls")),
 ]
 
 if settings.DEBUG:
