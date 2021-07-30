@@ -1,6 +1,8 @@
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 
+# reference : https://wikidocs.net/11060
+
 # 웹 드라이버매니저 이용
 # 버전 변경에 상관없이 현재 OS에 설치된 크롬브라우저를 사용합니다.
 

@@ -1,0 +1,18 @@
+<html>
+<title>일정관리</title>
+<body>
+<h1>일정목록</h1>
+
+<form method="POST">
+    <input id="id_new_item" name="item_text" placeholder="할일을 입력하세요"/>
+    {% csrf_token %} <!-- 없으면 에러 발생 -->
+</form>
+
+<table id="id_list_table">
+<tr>
+    <td>{{ new_item_text }}</td>
+</tr>
+</table>
+
+</body>
+</html>

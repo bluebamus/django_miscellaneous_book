@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import resolve
 from testcase_skills.views_ex.tdd_with_python_views import home_page
 
-
+# reference : https://wikidocs.net/11059
 class HomePageTest(TestCase):
     # success
     def test_root_url_resolves_to_home_page_view_success(self):
