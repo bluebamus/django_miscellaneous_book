@@ -58,8 +58,8 @@ for p in post:
 ### prefetch_related 사용 O
 
 ```python
-category = Category.objects.prefetch_related('post').get(name='django')
-for c in category.post_set.all():
+category = Category.objects.prefetch_related('post').get(name='modi')
+for c in category.post.all():
     print(c.title)
 ```
 
