@@ -1,3 +1,7 @@
+# 테스트 방법
+
+> commander : python manage.py shell_plus --print-sql --ipython
+
 # 사전 요구 지식 
 * query : 1개의 메인 쿼리로 부를 수 있음  
 

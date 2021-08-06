@@ -1,3 +1,7 @@
+# 테스트 방법
+
+> commander : python manage.py shell_plus --print-sql --ipython
+
 # _set vs related_name
 
 * ForeignKey에 related_name를 설정하지 않으면 역참조를 하는 경우, class명_set이 자동으로 설정된다.

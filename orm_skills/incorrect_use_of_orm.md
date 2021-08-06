@@ -1,3 +1,7 @@
+# 테스트 방법
+
+> commander : python manage.py shell_plus --print-sql --ipython
+
 # 실수하기 쉬운 Queryset의 특징
 
 * Django ORM을 작성하다보면 종종 당연히 '이렇게 수행 될거야' 라고 생각하지만 실제로는 그렇지 않은 부분들이 꽤 많이 존재한다.
