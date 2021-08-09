@@ -1,4 +1,5 @@
 from django.db import models
+from .models_ex.annotation_aggregation_like_excel_models import Product, OrderLog
 
 class Blog(models.Model):
     name = models.CharField(max_length=50)

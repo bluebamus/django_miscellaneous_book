@@ -120,4 +120,112 @@ category = Category.objects.prefetch_related(Prefetch('post', to_attr='post.set(
 
 * ORM의 특성상 원하는 SQL문을 직접적으로 만들어 낼 수 없기 때문에, 수행하려고 하는 SQL문을 먼저 떠올리는 것보다 필요한 데이터 리스트를 먼저 떠올리면서 ORM을 작성하는 편이 낫다고 생각한다.
 
-> reference : https://leffept.tistory.com/312?category=950490
+## 추가 - QuerySet 캐시 사용 예제
+```python
+from django.utils.functional import cached_property
+
+class Company(models.Model):
+    name: str = models.CharField(max_length=128, null=False)
+    tel_num: str = models.CharField(max_length=128, null=True)
+    address: str = models.CharField(max_length=128, null=False)
+  
+  # @property여도 sql은 발생안함 하지만 매번 호출시마다 list comprehension이 풀리는게 싫어서 @cached_property를 사용함
+   @cached_property
+    def fire_product_list(self):
+        return [product for product in self.product_set.all() if "불닭" in product.name]
+   
+  # cached_property 굳이 안써도 상관없음
+   @property
+    def noodle_product_list(self):
+        return [product for product in self.product_set.all() if "라면" in product.name]
+
+    
+
+class Product(models.Model):
+    name: str = models.CharField(null=False, max_length=128)
+    price: int = models.PositiveIntegerField(null=False, default=0)
+    product_owned_company: Company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=False)
+# 위와 같이 property를 선언해놓고   `prefetch_related("product_set") `옵션만 있으면  
+# company = company_query[0]
+# company.fire_product_list # sql 발생 x
+# company.noodle_product_list  # sql 발생 x
+# 로직도 깔끔하고 sql도 안나간다 
+company_queryset =Company.objects.prefetch_related("product_set") 
+
+
+
+
+# 하지만 이렇게 `to_attr`을 지정하는경우이면 company.noodle_product_list 호출시 N+1문제 발생
+company_queryset = (Company.objects
+       .prefetch_related(Prefetch("product_set",queryset=Product.objects.filter(name__contains="불닭")
+             ,to_attr="fire_product_list") # 해당 attr이 생성됨 
+      )
+)
+
+# property를 사용해도 무조건 N+1 Problem 발생하는 경우
+
+# self.xxx 로 접근해야 queryset의 즉시로딩 옵션의 해택을 볼수있다. 
+# 아래와 같이 선언시 즉시로딩 옵션(prefetch_related,select_related)이 queryset에 주어져도 무조건 N+1 Problem발생
+# @cached_property로 선언한다고 N+1 Problem이 해소되지 않는다 
+#  @cached_property는 인스턴스 레벨 캐시이다 queryset의 캐시과 전혀 관련없음을 참고
+@property
+    def noodle_product_list(self):
+        return [product for product in Product.objects.filter(company_id=self.id) if "라면" in product.name]
+```
+
+## QuerySet 이 생성하는 SQL 구조
+* 이런식으로 QuerySet을 작성하면 아래와 같은 SQL이 발생한다.
+* QuerySet이 만드는 SQL은 이 구조를 벗어나지 않는다. (FilteredRelation(), extra()같은 메서드들을 사용안한다는 전제 )
+* 따라서 내가 원하는 SQL 또는 데이터 들이 이런 구조를 벗어나는지 한번 고민해보자
+* 벗어난다면 NativeSQL 또는 .raw(RawQuerySet)을 사용하자
+
+### QuerySet
+```python
+queryset = (Model.objects
+            .select_related('정방향_참조필드1,','정방향_참조필드2',....) # n개 만큼 JOIN 한다. 
+            .annotate(커스텀프로퍼티_블라블라=F('모델필드아무거나'),  
+                      커스텀프로퍼티2_블라블라=Case(
+                          When(Case조건절_모델필드아무거나__isnull=False,  # filter질의는 아무거나 다 가능 __gte, __in 등등...
+                               then=Count('특정모델필드')), # 해당 값 기준으로 Count() 함수를 질의함
+                          default=Value(0, output_field=IntegerField(
+                                      help_text='해당 애트리뷰트 결과값을 django에서 무슨타입으로 받을건지 선언하는 param입니다.'),
+                          ),
+                      ))
+            .filter(각종_질의~~~~)
+            .prefetch_related(
+                        Prefetch('역방향_참조필드', # 추가 쿼리는 새로운 쿼리셋이다 여기서 쿼리셋에 원하는 튜닝이 가능 
+                                       queryset=(역방향_참조모델.objects
+                                                 .select_related('역방향_참조모델의_정방향참조모델').filter(역방향_각종_질의문))
+                                                # .prefetch_related('역방향_참조모델의_역(정)방향참조모델') 이런식으로도 가능
+                                )
+            )
+            )
+```
+
+### SQL
+```python
+SELECT *
+       모델필드아무거나 AS 커스텀프로퍼티_블라블라,
+       CASE
+           WHEN Case조건절_모델필드아무거나 IS NOT NULL
+               THEN COUNT('특정모델필드')
+        ELSE 0 END AS 커스텀프로퍼티_블라블라2,  # IntegerField()는 쿼리에서는 영향없음
+      
+FROM `orm_practice_app_order`
+         LEFT INNER JOIN '정방향 참조필드1'  # INNER OUTER 는 ForignKey(null= True or False 값에 의해 결정
+                         ON (~~~~)
+         LEFT OUTER JOIN '정방향 참조필드2'  # INNER OUTER 는 ForignKey(null= True or False 값에 의해 결정
+                         ON (~~~~)
+WHERE (각종_질의~~~~)
+
+
+SELECT *
+FROM 역방향_참조모델
+         INNER JOIN '역방향_참조모델의_정방향참조모델'
+                    ON (~~~~~)
+WHERE (역방향_각종_질의문 AND 메인쿼리의_Model.`related_id` IN (1,2,3,4,....));
+```
+
+> reference : https://leffept.tistory.com/312?category=950490   
+> reference : https://github.com/KimSoungRyoul/Django_ORM_pratice_project/issues/9   
+> reference : https://github.com/KimSoungRyoul/Django_ORM_pratice_project/issues/6

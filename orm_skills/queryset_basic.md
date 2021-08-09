@@ -536,6 +536,108 @@ deleted_cnt = queryset.delete(0)
 |keep_parents|bool(False)|True이며 모델이 타 모델의 외래키 연결을 가지고 있으면<br> 자신은 삭제하지 않고 연결된 자식 모델만 삭제합니다.|
 * 참고: keep_parents - 삭제되는 대상은 자신을 가리키는 모델을 지정합니다.
 
+## pickle()
+* 피클 모듈은 파이썬 객체 구조를 serialize/de-serialize하기 위한 바이너리 프로토콜을 구현한 것임
+* JSON은 텍스트 직렬화 형식(유니코드 텍스트를 출력하지만, 대개는 utf-8 으로 인코딩됩니다)인 반면, pickle은 바이너리 직렬화 형식
+  * https://docs.python.org/ko/3/library/pickle.html
+* 파이썬은 객체를 파일에 저장하는 pickle 모듈을 제공함
+  * https://skyfox83.tistory.com/100?category=902679
+  
+## Bulk_create()
+* 백엔드 개발을 하다 보면 한 번의 요청으로 테이블에 대량의 레코드를 삽입하게 될 경우가 있다. 예를들어 서비스를 이용하는 모든 유저들에게 노티스를 보내고 싶을 때, 다음과 같은 코드로 노티스 레코드를 생성 할 수 있을 것이다.
+```python
+users = User.objects.all()
+
+for user in users:
+    Notification(user=user, contents="반갑습니다.").save()
+```
+* 하지만 위와 같은 방법으로 for문을 돌며 다수의 오브젝트를 만들어 낼 경우 save() 메소드 한 번당 DB와의 connection이 한번 발생 하며 insert구문을 수행 하게 된다. 
+* 즉, 반복 횟수 == connection수가 되어서 서비스에 큰 부하가 생겨 장애를 야기할 수도 있다. 
+* 실제로 로컬에서 테스트를 하다가 설정해둔 최대 connection수를 넘겨버린 경우도 있었다
+* 이럴때 사용하는것이 bulk operation이며 이 bulk를 사용하면 다수의 레코드를 생성, 업데이트 할 때 한 번의 커넥션 만으로 insert 혹은 update를 수행 할 수 있다.
+* 사용법은 매우 간단하다. 만들고자 하는 테이블 모델의 오브젝트 리스트를 만들어 bulk_create의 인자로 넘겨준다.
+```python
+users = User.objects.all()
+
+# notification 오브젝트 리스트를 만든다.
+new_noti_list = [Notification(user=user, contents="반갑습니다.") for user in users]
+
+Notification.objects.bulk_create(new_noti_list)
+```
+* **Bulk_create 사용시 주의할 점**
+  * Bulk_create는 매우 편리한 기능이지만 사용할 때 꼭 주의해야 할 점이 있다. 
+  * 바로 bulk 를 사용하면 Django Model 클래스에서 제공 하는 기본 메소드(save, clean... 등) 들을 사용하지 못한다는 점이다. 
+  * 어떤 모델은 save(), clean() 메소드 등을 오버라이드 하여 오브젝트 저장 시점에 특별한 액션(트랜잭션, 유효성 검사 등)을 취할 수 있다. 
+  * 하지만 bulk 를 사용하면 오브젝트를 DB에 직접 때려박는 식이기 때문에 모델 클래스의 기본 메소드 지원을 받을 수 없다. 
+  * 그말은 즉 bulk operation을 통해 데이터 베이스에 유효하지 못한 값이 들어가거나 데이터의 무결성이 깨질 가능성이 생긴다는 것이다.
+  * 따라서 bulk를 사용하기 전 해당 모델의 생성에 의해 영향을 받는 모델이 있는지, 모든 필드에 유효한 값이 들어오는지 등의 전수조사를 철저히 해야 한다.
+
+## Queryset 합치기
+*  이런 Toy라는 모델이 있을 때, 우리는 Toy.objects.all() 같은 명령어를 통해 Toy 객체의 집합(Queryset)을 얻을 수 있을 것이다. 
+*  비지니스 로직을 작성하다 보면 여러 쿼리셋을모아 조합하여 응답으로 보내줘야 할 경우가 있는데 이럴 때 쿼리셋을 합치는 연산을 이용할 수 있다.
+
+```python
+# model 예시
+class Toy(models.Model):
+    name = models.CharField(max_length=50, help_text='이름')
+    price = models.IntegerField(help_text='가격')
+    company = models.CharField(max_length=50, help_text='판매사')
+
+# Queryset 합치는 예시
+qs1 = Toy.objects.filter(price__lte=10000) # 만원 이하인 장난감들
+qs2 = Toy.objects.filter(price__gt=20000)  # 2만원이 넘는 장난감들
+
+# 방법1
+result_set = qs1 | qs2  # qs1과 qs2를 합친 결과
+
+# 방법2
+result_set2 = qs1.union(qs2)
+```
+
+### '|' 와 union의 차이점
+* 쿼리셋을 합치기 위해 필요한 조건은 합치려고 하는 두 쿼리셋이 같은 필드를 갖고 있어야 한다
+  * 엄밀히 말하면 같은 모델이라도 필드명과 타입이 똑같으면 쿼리셋을 합칠 수 있다는 것이다.
+  *  물론 필드가 다르더라도 ORM 작성시 annotate를 통해 필요한 컬럼을 붙여 최종적으로 queryset에 담겨있는 모델의 스키마가 같게 해주면 합쳐질 수 있다.
+```python
+class Toy(models.Model):
+    name = models.CharField(max_length=50, help_text='이름')
+    price = models.IntegerField(help_text='가격')
+    company = models.CharField(max_length=50, help_text='판매사')
+    
+class Toy2(models.Model):
+    name = models.CharField(max_length=50, help_text='이름')
+    price = models.IntegerField(help_text='가격')
+```
+* 위의 Toy와 Toy2 모델은 다른 모델이지만 다음과 같이 company 컬럼을 추가해 주어 쿼리셋을 만들어 주면 Toy 쿼리셋과 합칠 수 있다는 것이다. 
+```python
+Toy2.objects.annotate(company=Value('company2', output_field=CharField())
+```
+* 다음 예시
+```python
+qs1 = Toy.objects.annotate(is_sold_out=Value(True, output_field=BooleanField()).all()
+qs2 = Toy2.objects.annotate(company=Value('company2', output_field=CharField(),
+			    is_sold_out=Value(False, output_field=BooleanField())).all()
+                            
+result = qs1 | qs2
+```
+* qs1 에는 Toy 모델에 is_sold_out 이라는 컬럼을 추가하여 True라는 값으로 채워 넣었고, Toy2는 company와 is_sold_out 컬럼 두 컬럼을 추가하여 qs1과 qs2에 담긴 객체는 name, price, company, is_sold_out 이라는 동일한 4 컬럼을 가지고 있게 되었다.
+  * 결과적으로 result쿼리셋 에서는 qs1의 객체들은 is_sold_out이 True, qs2의 객체들은 is_sold_out이 False가 담긴 채 합쳐져 들어가 있을것이라고 예상했다. 하지만 모든 객체의 is_sold_out이 True인게 아니겠는가??
+* 문제는 Django ORM 코드의 평가 시점 때문에 생긴 문제였다. 
+  * Django는 db접근의 효율을 높이기 위하여 코드를 읽는 순간 db에 접근하여 ORM의 결과를 수행한 결과를 가져오는 것이 아닌 필요시점에 접근하여 가져오게 된다. 
+  * 위의 코드 대로 라면 qs1, qs2는 result에 합쳐지는 순간 쿼리를 해서 가져온다. 
+  * 그 순간에 '|'연산자와 union의 동작 방식의 차이때문에 결과에도 차이가 생기게 된다.
+    * qs1 | qs2 는 각 필드들을 OR 조건을 통해 가져오는 SQL문을 작성했으며,
+    * qs1.union(qs2) 는 q1에 해당하는 질의와 qs2에 해당하는 질의를 union연산으로 합친 SQL문을 작성했다.
+* 이러한 결과를 위의 Toy모델에 적용시켜 보면 is_sold_out이라는 필드는 Toy에는 True, Toy2에는 False이니 qs1 | qs2 라는 연산을 하면 is_sold_out의 결과는 True or False로 항상 True가 나오는 것이었다.
+* **원하는 대로 qs1에는 True, qs2에는 False가 나오게 하려면 qs1질의 따로 qs2질의를 따로 하는 qs1.union(qs2) 로 합쳐야 한다는 결론이 나왔다.**
+* 이처럼 '|' 연산자와 union의 수행 방식에 차이에 따라 결과가 달라질 수 있으니 쿼리셋을 합칠때는 주의하도록 하자. 특히 '|'연산자는 두 모델이 필드를 OR하기 때문에 복잡한 annotate로 명시적으로 컬럼을 만들어 주면 오류를 내뱉을 확률이 크니 **annotate를 사용한 쿼리셋, 그리고 Bool필드가 들어간 쿼리셋을 합칠 시에는 union을 이용하도록하자.**
+```python
+result = qs1.union(q2)
+```
+* 위 방법을 사용하니 qs1에는 True qs2에는 False로 원하는 값이 들어가 있었다. 
+* 이게 어떻게 된 일인가 하고 silk라는 django 프로파일링 툴을 이용하여 ORM - > SQL로 바뀐 결과를 살펴보았다.
 > reference : https://github.com/lewis810k/fastcampus/blob/master/33_%EC%BF%BC%EB%A6%AC%EC%85%8B_%EB%A9%94%EC%86%8C%EB%93%9C%281%29.md#%EC%BF%BC%EB%A6%AC%EC%85%8B%EC%9D%98-%ED%99%9C%EC%9A%A9   
 > reference : https://yongineer.netlify.app/django/queryset-api/
-> reference : https://blog.live2skull.kr/django/django-orm-01-basic/
+> reference : https://blog.live2skull.kr/django/django-orm-01-basic/   
+> reference : https://gardeny.tistory.com/15   
+> reference : https://gardeny.tistory.com/13?category=884965
