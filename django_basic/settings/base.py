@@ -249,6 +249,17 @@ SITE_ID = 1  # ㅇ
 DEFAULT_LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "loggers": {
+        "django": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+        },
+        "django.server": {
+            "handlers": ["django.server"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+    },
     "filters": {
         "require_debug_false": {
             "()": "django.utils.log.RequireDebugFalse",
@@ -256,7 +267,7 @@ DEFAULT_LOGGING = {
         "require_debug_true": {
             "()": "django.utils.log.RequireDebugTrue",
         },
-    },
+    },  
     "formatters": {
         "django.server": {
             "()": "django.utils.log.ServerFormatter",
@@ -269,7 +280,7 @@ DEFAULT_LOGGING = {
             "datefmt": "%d/%b/%Y %H:%M:%S",
             "style": "{",
         },
-    },
+    },      
     "handlers": {
         "file": {
             "level": "INFO",
@@ -297,15 +308,5 @@ DEFAULT_LOGGING = {
             "class": "django.utils.log.AdminEmailHandler",
         },
     },
-    "loggers": {
-        "django": {
-            "handlers": ["console", "file"],
-            "level": "INFO",
-        },
-        "django.server": {
-            "handlers": ["django.server"],
-            "level": "DEBUG",
-            "propagate": False,
-        },
-    },
+    
 }
